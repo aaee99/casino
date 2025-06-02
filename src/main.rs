@@ -5,23 +5,55 @@ use std::io;
 // можно ставить на число
 // можно крутить слоты где
 // морковка семерки какашки вишня
-fn main() {
-    let mut rng = rand::rng();
+struct Player{
+    balance:i32,
+    bid:i32,
+}
+impl Player{
+    fn add_balance(&mut self,sum:i32){
+        self.balance += sum;
+    }
+    // fn check_balance(&self) -> i32{
+    //     self.balance
+    // }
 
+}
+fn main() {
+    println!("
+        
+                                                     
+                            ,,                       
+                            db                       
+                                                     
+ ,p6*bo   ,6*Yb.  ,pP*Ybd `7MM  `7MMpMMMb.  ,pW*Wq.  
+6M'  OO  8)   MM  8I   `*   MM    MM    MM 6W'   `Wb 
+8M        ,pm9MM  `YMMMa.   MM    MM    MM 8M     M8 
+YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9 
+ YMbmd'  `Moo9^Yo.M9mmmP' .JMML..JMML  JMML.`Ybmd9'  
+                                                     
+                                                     
+
+    ");
+    let mut rng = rand::rng();
+    let mut player = Player{balance:100,bid:10,};
     // loop {
     //
     //     // let n = random(&mut rng);
     //     // println!("{n}");
     // };
+    
     loop {
-        println!("\n\n\n\n\n\n\n");
+        // println!("\n\n\n\n\n\n\n");
+        
+        hud(&player);
         println!("во что играть");
         println!("1. Красное/Черное");
         println!("2. Слоты");
         println!("3. Ставить на число");
         match input().as_str() {
             "1" => {
-                println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                // println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                hud(&player);
                 println!("ТЫ ВЫБРАЛ 1. Красное/Черное");
                 println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
                 let i = red_and_black(&mut rng);
@@ -42,10 +74,12 @@ fn main() {
                         ];
                         match k.contains(&i) {
                             true => {
-                                println!("ТЫ ВЫИГРАЛ!!!!")
+                                println!("ТЫ ВЫИГРАЛ!!!!");
+                                player.add_balance(player.bid);
                             }
                             false => {
-                                println!("ТЫ ПРОИГРАЛ!!!")
+                                println!("ТЫ ПРОИГРАЛ!!!");
+                                player.add_balance(-player.bid);
                             }
                         }
                     }
@@ -58,6 +92,7 @@ fn main() {
                         match k.contains(&i) {
                             true => {
                                 println!("ТЫ ВЫИГРАЛ!!!!")
+                                
                             }
                             false => {
                                 println!("ТЫ ПРОИГРАЛ!!!")
@@ -94,4 +129,8 @@ fn input() -> String {
 }
 fn red_and_black(rng: &mut ThreadRng) -> u32 {
     rng.random_range(1..37)
+}
+fn hud(player: &Player){
+        println!("Баланс: {}",player.balance);
+        println!("Cтавка: {}",player.bid);
 }
