@@ -5,21 +5,21 @@ use std::io;
 // можно ставить на число
 // можно крутить слоты где
 // морковка семерки какашки вишня
-struct Player{
-    balance:i32,
-    bid:i32,
+struct Player {
+    balance: i32,
+    bid: i32,
 }
-impl Player{
-    fn add_balance(&mut self,sum:i32){
+impl Player {
+    fn add_balance(&mut self, sum: i32) {
         self.balance += sum;
     }
     // fn check_balance(&self) -> i32{
     //     self.balance
     // }
-
 }
 fn main() {
-    println!("
+    println!(
+        "
         
                                                      
                             ,,                       
@@ -33,18 +33,22 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
                                                      
                                                      
 
-    ");
+    "
+    );
     let mut rng = rand::rng();
-    let mut player = Player{balance:100,bid:10,};
+    let mut player = Player {
+        balance: 100,
+        bid: 10,
+    };
     // loop {
     //
     //     // let n = random(&mut rng);
     //     // println!("{n}");
     // };
-    
+
     loop {
         // println!("\n\n\n\n\n\n\n");
-        
+
         hud(&player);
         println!("во что играть");
         println!("1. Красное/Черное");
@@ -54,9 +58,9 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
             "1" => {
                 // println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 hud(&player);
-                println!("ТЫ ВЫБРАЛ 1. Красное/Черное");
-                println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
-                let i = red_and_black(&mut rng);
+                // println!("ТЫ ВЫБРАЛ 1. Красное/Черное");
+
+                // let i = red_and_black(&mut rng);
                 // match input().trim().parse::<u32>(){
                 //     Ok(n) => n,
                 //     Err(_) => {
@@ -64,56 +68,7 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
                 //         return;
                 //     }
                 // }
-                println!("1. Красное\n2. Черное\n3. Зеленое");
-                match input().as_str() {
-                    "1" => {
-                        println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                        println!("ТЫ ВЫБРАЛ КРАСНОЕ");
-                        let k = [
-                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                        ];
-                        match k.contains(&i) {
-                            true => {
-                                println!("ТЫ ВЫИГРАЛ!!!!");
-                                player.add_balance(player.bid);
-                            }
-                            false => {
-                                println!("ТЫ ПРОИГРАЛ!!!");
-                                player.add_balance(-player.bid);
-                            }
-                        }
-                    }
-                    "2" => {
-                        println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                        println!("ТЫ ВЫБРАЛ ЧЕРНОЕ");
-                        let k = [
-                            19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-                        ];
-                        match k.contains(&i) {
-                            true => {
-                                println!("ТЫ ВЫИГРАЛ!!!!")
-                                
-                            }
-                            false => {
-                                println!("ТЫ ПРОИГРАЛ!!!")
-                            }
-                        }
-                    }
-                    "3" => {
-                        println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                        println!("ТЫ ВЫБРАЛ ЗЕЛЕНОЕ");
-                        let k = [37];
-                        match k.contains(&i) {
-                            true => {
-                                println!("ТЫ ВЫИГРАЛ!!!!")
-                            }
-                            false => {
-                                println!("ТЫ ПРОИГРАЛ!!!")
-                            }
-                        }
-                    }
-                    &_ => continue,
-                }
+                red_and_black(&mut rng, &mut player);
             }
             &_ => continue,
         };
@@ -127,10 +82,43 @@ fn input() -> String {
     io::stdin().read_line(&mut input).expect("Ошибка ввода");
     input.trim().to_string()
 }
-fn red_and_black(rng: &mut ThreadRng) -> u32 {
-    rng.random_range(1..37)
+fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
+    let result = rng.random_range(1..=37);
+    let mut mult: f32 =1.0;
+    println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
+    println!("1. Красное\n2. Черное\n3. Зеленое");
+    let win = match input().as_str() {
+        "1" => {
+            player.add_balance(-player.bid);
+            println!("ТЫ ВЫБРАЛ КРАСНОЕ");
+            mult=1.0;
+            (1..=18).contains(&result)
+        },
+
+        "2" => {
+            player.add_balance(-player.bid);
+            println!("ТЫ ВЫБРАЛ ЧЕРНОЕ");
+            mult=1.0;
+            (18..=36).contains(&result)
+        },
+        "3" => {
+            player.add_balance(-player.bid);
+            println!("ТЫ ВЫБРАЛ ЗЕЛЕНОЕ");
+            mult=20.0;
+            result == 37
+        },
+        &_ => return,
+    };
+
+    if win {
+        println!("ТЫ ВЫИГРАЛ!!!!");
+        let sum = (player.bid as f32 * mult).round() as i32;
+        player.add_balance(sum);
+    } else {
+        println!("ТЫ ПРОИГРАЛ!!!");
+    }
 }
-fn hud(player: &Player){
-        println!("Баланс: {}",player.balance);
-        println!("Cтавка: {}",player.bid);
+fn hud(player: &Player) {
+    println!("Баланс: {}", player.balance);
+    println!("Cтавка: {}", player.bid);
 }
