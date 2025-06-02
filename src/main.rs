@@ -16,6 +16,9 @@ impl Player {
     // fn check_balance(&self) -> i32{
     //     self.balance
     // }
+    fn add_bid(&mut self, sum: i32) {
+        self.bid += sum;
+    }
 }
 fn main() {
     println!(
@@ -51,9 +54,11 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
 
         hud(&player);
         println!("во что играть");
-        println!("1. Красное/Черное");
-        println!("2. Слоты");
-        println!("3. Ставить на число");
+        println!("
+        1. Красное/Черное
+           2. Слоты
+             3. Ставить на число
+        ");
         match input().as_str() {
             "1" => {
                 // println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -68,7 +73,22 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
                 //         return;
                 //     }
                 // }
-                red_and_black(&mut rng, &mut player);
+                if player.balance >= player.bid && player.bid > 0 {
+                    red_and_black(&mut rng, &mut player);
+                } else{
+                    println!("
+                    🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+                    У ТЕБЯ НЕТУ БАЛАНСА ЛИБО СТАВКА НЕПРАВИЛЬНАЯ
+                    🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+                    ");
+                    continue
+                }
+            }
+            "w" | "W" => {
+                player.add_bid(10);
+            }
+            "s" | "S" => {
+                player.add_bid(-10);
             }
             &_ => continue,
         };
@@ -84,34 +104,45 @@ fn input() -> String {
 }
 fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
     let result = rng.random_range(1..=37);
-    let mut mult: f32 =1.0;
+    let mut mult: f32 = 1.0;
     println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
-    println!("1. Красное\n2. Черное\n3. Зеленое");
+    println!("
+    1 Красное 🔴
+      2 Черное 🖤
+       3 Зеленое 💚
+    ");
     let win = match input().as_str() {
         "1" => {
             player.add_balance(-player.bid);
-            println!("ТЫ ВЫБРАЛ КРАСНОЕ");
-            mult=1.0;
+            println!("
+            ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+            ");
+            mult = 2.0;
             (1..=18).contains(&result)
-        },
+        }
 
         "2" => {
             player.add_balance(-player.bid);
-            println!("ТЫ ВЫБРАЛ ЧЕРНОЕ");
-            mult=1.0;
+            println!("
+            🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤
+            ");
+            mult = 2.0;
             (18..=36).contains(&result)
-        },
+        }
         "3" => {
             player.add_balance(-player.bid);
-            println!("ТЫ ВЫБРАЛ ЗЕЛЕНОЕ");
-            mult=20.0;
+            println!("
+            💚💚💚💚💚💚💚💚💚💚💚💚💚💚
+            ");
+            mult = 20.0;
             result == 37
-        },
+        }
         &_ => return,
     };
 
     if win {
-        println!("
+        println!(
+            "
         
  ######  ##   ## ##   ## ####### ######     ####   ##### 
  ##   ## ##   ## ##  ### ##      ##   ##   ## ##  ##  ## 
@@ -122,11 +153,13 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
  ######  ####  # ##   ## ##      ##      ##   ## ##   ## 
                                                          
 
-        ");
+        "
+        );
         let sum = (player.bid as f32 * mult).round() as i32;
         player.add_balance(sum);
     } else {
-        println!("
+        println!(
+            "
         
  ####### ######   #####  ##   ## ####### ######     ####   ##### 
  ##   ## ##   ## ##   ## ##  ### ##      ##   ##   ## ##  ##  ## 
@@ -137,10 +170,19 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
  ##   ## ##       #####  ##   ## ##      ##      ##   ## ##   ## 
                                                                  
 
-        ");
+        "
+        );
     }
 }
 fn hud(player: &Player) {
-    println!("Баланс: {}", player.balance);
-    println!("Cтавка: {}", player.bid);
+    println!("
+            Баланс: {}
+    ", player.balance);
+    println!("
+        Cтавка: {}
+    ", player.bid);
+    println!("
+    + Увеличить ставку W
+     - Уменьшить ставку S
+    ")
 }
