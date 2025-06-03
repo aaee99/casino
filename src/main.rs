@@ -1,3 +1,4 @@
+use colored::*;
 use rand::prelude::*;
 use std::io;
 // можно ставить на красное или на черное
@@ -22,9 +23,8 @@ impl Player {
 }
 fn main() {
     println!(
+        "{}",
         "
-        
-                                                     
                             ,,                       
                             db                       
                                                      
@@ -34,9 +34,8 @@ fn main() {
 YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9 
  YMbmd'  `Moo9^Yo.M9mmmP' .JMML..JMML  JMML.`Ybmd9'  
                                                      
-                                                     
-
-    "
+                                                     "
+        .bright_yellow()
     );
     let mut rng = rand::rng();
     let mut player = Player {
@@ -54,11 +53,15 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
 
         hud(&player);
         println!("во что играть");
-        println!("
-        1. Красное/Черное
+        println!(
+            "
+        1. {}/{}
            2. Слоты
              3. Ставить на число
-        ");
+        ",
+            "красное".red(),
+            "черное".black()
+        );
         match input().as_str() {
             "1" => {
                 // println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -75,19 +78,15 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
                 // }
                 if player.balance >= player.bid && player.bid > 0 {
                     red_and_black(&mut rng, &mut player);
-                } else{
-                    println!("
-                    🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
-                    У ТЕБЯ НЕТУ БАЛАНСА ЛИБО СТАВКА НЕПРАВИЛЬНАЯ
-                    🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
-                    ");
-                    continue
+                } else {
+                    println!("У ТЕБЯ НЕТУ БАЛАНСА ЛИБО СТАВКА НЕПРАВИЛЬНАЯ");
+                    continue;
                 }
             }
-            "w" | "W" => {
+            "w" | "W" | "+" => {
                 player.add_bid(10);
             }
-            "s" | "S" => {
+            "s" | "S" | "-" => {
                 player.add_bid(-10);
             }
             &_ => continue,
@@ -106,34 +105,30 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
     let result = rng.random_range(1..=37);
     let mut mult: f32 = 1.0;
     println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
-    println!("
-    1 Красное 🔴
-      2 Черное 🖤
-       3 Зеленое 💚
-    ");
+    println!(
+        "
+    1 {}
+      2 {}
+       3 {}
+    ",
+        "красное".on_red(),
+        "черное".on_black(),
+        "зеленое".on_green()
+    );
     let win = match input().as_str() {
         "1" => {
             player.add_balance(-player.bid);
-            println!("
-            ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
-            ");
             mult = 2.0;
             (1..=18).contains(&result)
         }
 
         "2" => {
             player.add_balance(-player.bid);
-            println!("
-            🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤🖤
-            ");
             mult = 2.0;
             (18..=36).contains(&result)
         }
         "3" => {
             player.add_balance(-player.bid);
-            println!("
-            💚💚💚💚💚💚💚💚💚💚💚💚💚💚
-            ");
             mult = 20.0;
             result == 37
         }
@@ -141,9 +136,27 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
     };
 
     if win {
-        println!(
-            "
-        
+        print_result("win");
+        let sum = (player.bid as f32 * mult).round() as i32;
+        player.add_balance(sum);
+    } else {
+        print_result("loose");
+    }
+}
+fn hud(player: &Player) {
+    println!("Баланс: {}", player.balance.to_string().bright_yellow());
+    println!("Cтавка: {}", player.bid.to_string().bright_blue());
+    println!(
+        "
+        {} Увеличить ставку [+]
+            {}  Уменьшить ставку [-]
+    ",
+        "[W]".bright_green(), "[S]".bright_red()
+    )
+}
+fn print_result(w: &'static str) {
+    let result = match w {
+        "win" => r#"
  ######  ##   ## ##   ## ####### ######     ####   ##### 
  ##   ## ##   ## ##  ### ##      ##   ##   ## ##  ##  ## 
  ##   ## ##   ## ##  ### ##      ##   ##  ##  ##  ##  ## 
@@ -151,16 +164,10 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
  ##   ## ##  # # ###  ## ##      ##      #######  ##  ## 
  ##   ## ##  # # ##   ## ##      ##      ##   ##  ##  ## 
  ######  ####  # ##   ## ##      ##      ##   ## ##   ## 
-                                                         
-
-        "
-        );
-        let sum = (player.bid as f32 * mult).round() as i32;
-        player.add_balance(sum);
-    } else {
-        println!(
-            "
-        
+        "#
+        .green()
+        .bold(),
+        "loose" => r#"
  ####### ######   #####  ##   ## ####### ######     ####   ##### 
  ##   ## ##   ## ##   ## ##  ### ##      ##   ##   ## ##  ##  ## 
  ##   ## ##   ## ##   ## ##  ### ##      ##   ##  ##  ##  ##  ## 
@@ -168,21 +175,10 @@ fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
  ##   ## ##      ##   ## ###  ## ##      ##      #######  ##  ## 
  ##   ## ##      ##   ## ##   ## ##      ##      ##   ##  ##  ## 
  ##   ## ##       #####  ##   ## ##      ##      ##   ## ##   ## 
-                                                                 
-
-        "
-        );
-    }
-}
-fn hud(player: &Player) {
-    println!("
-            Баланс: {}
-    ", player.balance);
-    println!("
-        Cтавка: {}
-    ", player.bid);
-    println!("
-    + Увеличить ставку W
-     - Уменьшить ставку S
-    ")
+        "#
+        .red()
+        .bold(),
+        _ => return,
+    };
+    println!("{result}");
 }
