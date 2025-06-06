@@ -1,6 +1,8 @@
 use colored::*;
 use rand::prelude::*;
 use std::io;
+use std::thread;
+use std::time::Duration;
 // можно ставить на красное или на черное
 // Баланс
 // можно ставить на число
@@ -22,6 +24,7 @@ impl Player {
     }
 }
 fn main() {
+    control::set_virtual_terminal(true).expect("Could not enable ANSI colors");
     println!(
         "{}",
         "
@@ -35,9 +38,9 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
  YMbmd'  `Moo9^Yo.M9mmmP' .JMML..JMML  JMML.`Ybmd9'  
                                                      
                                                      "
-        .bright_yellow()
+        .bright_yellow().bold()
     );
-    let mut rng = rand::rng();
+    
     let mut player = Player {
         balance: 100,
         bid: 10,
@@ -65,7 +68,7 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
         match input().as_str() {
             "1" => {
                 // println!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-                hud(&player);
+                // hud(&player);
                 // println!("ТЫ ВЫБРАЛ 1. Красное/Черное");
 
                 // let i = red_and_black(&mut rng);
@@ -77,9 +80,18 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
                 //     }
                 // }
                 if player.balance >= player.bid && player.bid > 0 {
-                    red_and_black(&mut rng, &mut player);
+                    red_and_black(&mut player);
                 } else {
-                    println!("У ТЕБЯ НЕТУ БАЛАНСА ЛИБО СТАВКА НЕПРАВИЛЬНАЯ");
+                    casino_error();
+                    continue;
+                }
+            }
+            "2"=>{
+                // hud(&player);
+                if player.balance >= player.bid && player.bid > 0 {
+                    slots(&mut player);
+                } else {
+                    casino_error();
                     continue;
                 }
             }
@@ -93,17 +105,45 @@ YM.    , 8M   MM  L.   I8   MM    MM    MM YA.   ,A9
         };
     }
 }
-fn random(rng: &mut ThreadRng) -> u32 {
-    rng.random_range(1..10000)
+fn casino_error(){
+    println!("У ТЕБЯ НЕТУ БАЛАНСА ЛИБО СТАВКА НЕПРАВИЛЬНАЯ");
 }
 fn input() -> String {
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Ошибка ввода");
     input.trim().to_string()
 }
-fn red_and_black(rng: &mut ThreadRng, player: &mut Player) {
+fn slots(player: &mut Player){
+    let mut rng = rand::rng();
+    let items = [
+        "🍒",
+        "🍒",
+        "💩",
+        "💩",
+        "💩",
+        "7️⃣",
+        "🥕",
+        "🥕",
+        "💎",
+        "💎",
+        "🔔",
+        "🔔",
+        ];
+    let mut result_items = vec!["";3];
+    for i in 0..3{
+        let random_item = rng.random_range(0..items.len());
+        result_items[i] = items[random_item];
+        
+        thread::sleep(Duration::from_millis(200+i as u64*200));
+        println!("{}",result_items.join(" "));
+    }
+    
+}
+fn red_and_black(player: &mut Player) {
+    
+    let mut rng = rand::rng();
     let result = rng.random_range(1..=37);
-    let mut mult: f32 = 1.0;
+    let mult: f32;
     println!("ТЕПЕРЬ ВЫБЕРИ ЦВЕТ");
     println!(
         "
